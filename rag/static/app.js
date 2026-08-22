@@ -39,7 +39,7 @@ function initPresets() {
     
     PRESET_QUERIES.forEach(p => {
         const btn = document.createElement("button");
-        btn.className = "px-2.5 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-[11px] text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1";
+        btn.className = "preset-chip";
         btn.textContent = p.label;
         btn.onclick = () => {
             document.getElementById("inputQueryText").value = p.text;
