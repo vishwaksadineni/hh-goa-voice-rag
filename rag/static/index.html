@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-Enabled RAG System | HH Goa 2026</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            accent: '#6366f1',
+                            accentHover: '#4f46e5',
+                            dark: '#0b0f19',
+                            card: '#111827',
+                            cardBorder: '#1f2937'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col font-sans selection:bg-brand-accent selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="border-b border-brand-cardBorder bg-brand-card/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-500 to-brand-accent flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i data-lucide="mic" class="h-5 w-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight flex items-center gap-2">
+                        Voice-Enabled RAG System
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-accent/20 text-brand-accent border border-brand-accent/30">HH Goa 2026</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">AI4Bharat MSMARCO-XI Multilingual RAG • Sub-200ms Latency SLA</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <div class="hidden md:flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800 text-xs">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-slate-400">Target SLA:</span>
+                    <span class="font-semibold text-emerald-400">&lt; 200ms</span>
+                </div>
+                
+                <button id="btnOpenSettings" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700 flex items-center gap-1.5 text-xs font-medium">
+                    <i data-lucide="settings" class="h-4 w-4"></i>
+                    <span>Config</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Top Strategy & Provider Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div class="bg-brand-card p-3.5 rounded-xl border border-brand-cardBorder flex items-center justify-between">
+                <div>
+                    <div class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Chunking Strategy</div>
+                    <div id="activeStrategyBadge" class="text-sm font-semibold text-brand-500 capitalize">Hierarchical (Parent-Child)</div>
+                </div>
+                <div class="p-2 rounded-lg bg-emerald-500/10 text-brand-500">
+                    <i data-lucide="layers" class="h-5 w-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-brand-card p-3.5 rounded-xl border border-brand-cardBorder flex items-center justify-between">
+                <div>
+                    <div class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">STT Engine</div>
+                    <div id="activeSttBadge" class="text-sm font-semibold text-indigo-400 capitalize">Sarvam AI (Saaras)</div>
+                </div>
+                <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                    <i data-lucide="waveform" class="h-5 w-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-brand-card p-3.5 rounded-xl border border-brand-cardBorder flex items-center justify-between">
+                <div>
+                    <div class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Vector Store & RRF</div>
+                    <div class="text-sm font-semibold text-cyan-400">FastEmbed ONNX + BM25</div>
+                </div>
+                <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+                    <i data-lucide="zap" class="h-5 w-5"></i>
+                </div>
+            </div>
+
+            <div class="bg-brand-card p-3.5 rounded-xl border border-brand-cardBorder flex items-center justify-between">
+                <div>
+                    <div class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Semantic Cache</div>
+                    <div class="text-sm font-semibold text-amber-400">Multi-Tier LRU (&lt;1ms)</div>
+                </div>
+                <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                    <i data-lucide="database" class="h-5 w-5"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategy Selector Tabs -->
+        <div class="bg-brand-card p-4 rounded-xl border border-brand-cardBorder space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="git-branch" class="h-4 w-4 text-brand-accent"></i>
+                    Vast Chunking Strategy Suite
+                </span>
+                <span class="text-xs text-slate-400">Select strategy to dynamically re-route retrieval</span>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2" id="strategyTabsContainer">
+                <button data-strategy="hierarchical" class="strat-btn active px-3 py-2.5 rounded-lg border text-left transition flex flex-col justify-between">
+                    <div class="font-semibold text-xs text-white">Hierarchical (Parent-Child)</div>
+                    <div class="text-[10px] text-slate-400 mt-1">High-res child vector search with parent context expansion</div>
+                </button>
+                <button data-strategy="semantic" class="strat-btn px-3 py-2.5 rounded-lg border text-left transition flex flex-col justify-between">
+                    <div class="font-semibold text-xs text-white">Semantic Boundary</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Splits along discourse transitions and linguistic coherence</div>
+                </button>
+                <button data-strategy="metadata_aware" class="strat-btn px-3 py-2.5 rounded-lg border text-left transition flex flex-col justify-between">
+                    <div class="font-semibold text-xs text-white">Metadata-Aware</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Embeds language, document ID, and query type headers</div>
+                </button>
+                <button data-strategy="sentence_window" class="strat-btn px-3 py-2.5 rounded-lg border text-left transition flex flex-col justify-between">
+                    <div class="font-semibold text-xs text-white">Sentence-Window</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Focal sentence matching with sliding k-neighbor window</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Voice & Query Input Interactive Area -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left 2 Cols: Voice Recording & Text Query -->
+            <div class="lg:col-span-2 space-y-4">
+                <div class="bg-brand-card p-5 rounded-xl border border-brand-cardBorder space-y-4 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="mic-vocal" class="h-4 w-4 text-brand-500"></i>
+                            Voice Input & Speech-to-Text
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <select id="selectSttLang" class="bg-slate-800 border border-slate-700 text-xs rounded-md px-2 py-1 text-slate-300">
+                                <option value="hi-IN">Hindi (hi-IN)</option>
+                                <option value="en-IN" selected>English (en-IN)</option>
+                                <option value="bn-IN">Bengali (bn-IN)</option>
+                                <option value="ta-IN">Tamil (ta-IN)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Audio Waveform Visualizer & Record Button -->
+                    <div class="bg-slate-900/90 rounded-xl p-4 border border-slate-800/80 flex flex-col items-center justify-center space-y-3">
+                        <canvas id="waveformCanvas" width="600" height="70" class="w-full h-16 rounded-lg bg-slate-950/50"></canvas>
+                        
+                        <div class="flex items-center space-x-4">
+                            <button id="btnRecordVoice" class="group relative flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-tr from-brand-500 to-emerald-400 text-white shadow-lg shadow-brand-500/30 hover:scale-105 active:scale-95 transition">
+                                <i data-lucide="mic" id="recordIcon" class="h-6 w-6"></i>
+                                <span id="recordingPulse" class="hidden absolute inset-0 rounded-full bg-red-500 animate-ping opacity-75"></span>
+                            </button>
+
+                            <div class="text-left">
+                                <div id="recordingStatus" class="text-sm font-semibold text-slate-200">Tap Microphone to Speak</div>
+                                <div id="recordingTimer" class="text-xs text-slate-400">Supports Sarvam AI (Indic) / ElevenLabs / Local</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Search Fallback -->
+                    <div class="space-y-2">
+                        <div class="relative">
+                            <input type="text" id="inputQueryText" placeholder="Or type any question (e.g. What is the capital of Goa? / गोवा की राजधानी क्या है?)..." 
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent transition pr-24">
+                            <button id="btnSubmitQuery" class="absolute right-2 top-2 px-4 py-1.5 rounded-lg bg-brand-accent hover:bg-brand-accentHover text-white text-xs font-semibold shadow transition flex items-center gap-1">
+                                <span>Query</span>
+                                <i data-lucide="send" class="h-3.5 w-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Preset Voice Query Carousel -->
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+                            <span>Preset Benchmark Queries (Click to test)</span>
+                            <span class="text-[10px] text-brand-500">MSMARCO-XI Corpus</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5" id="presetsContainer">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Answer & Response Card -->
+                <div class="bg-brand-card p-5 rounded-xl border border-brand-cardBorder space-y-4" id="answerContainer">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                                <i data-lucide="sparkles" class="h-4 w-4 text-brand-accent"></i>
+                                Generated Grounded Response
+                            </span>
+                            <span id="cacheBadge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                ⚡ SEMANTIC CACHE HIT (&lt;1ms)
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="btnSpeakAnswer" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1 border border-slate-700 transition">
+                                <i data-lucide="volume-2" class="h-3.5 w-3.5"></i>
+                                <span>Listen</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="answerText" class="text-slate-100 text-base leading-relaxed p-4 rounded-xl bg-slate-900/60 border border-slate-800 font-normal">
+                        Ready. Ask a voice query or click a preset question to test the pipeline.
+                    </div>
+
+                    <!-- Guardrail Verdict Badge Bar -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-800" id="guardrailVerdicts">
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center space-x-2">
+                            <div id="badgeInputSafeIcon" class="p-1 rounded bg-emerald-500/20 text-emerald-400">
+                                <i data-lucide="shield-check" class="h-4 w-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase">Input Safety</div>
+                                <div id="badgeInputSafeText" class="text-xs font-semibold text-emerald-400">SAFE</div>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center space-x-2">
+                            <div id="badgeDomainIcon" class="p-1 rounded bg-emerald-500/20 text-emerald-400">
+                                <i data-lucide="compass" class="h-4 w-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase">Domain Alignment</div>
+                                <div id="badgeDomainText" class="text-xs font-semibold text-emerald-400">IN-DOMAIN</div>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center space-x-2">
+                            <div id="badgeRetrievalIcon" class="p-1 rounded bg-emerald-500/20 text-emerald-400">
+                                <i data-lucide="check-circle" class="h-4 w-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase">Retrieval Conf.</div>
+                                <div id="badgeRetrievalText" class="text-xs font-semibold text-emerald-400">92%</div>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex items-center space-x-2">
+                            <div id="badgeGroundingIcon" class="p-1 rounded bg-emerald-500/20 text-emerald-400">
+                                <i data-lucide="award" class="h-4 w-4"></i>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 uppercase">Grounding Entail.</div>
+                                <div id="badgeGroundingText" class="text-xs font-semibold text-emerald-400">VERIFIED</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Retrieved Sources Accordion -->
+                    <div class="space-y-2 pt-2">
+                        <button id="toggleSourcesBtn" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 font-medium transition">
+                            <i data-lucide="chevron-right" id="sourcesChevron" class="h-4 w-4 transition-transform"></i>
+                            <span>View Retrieved Passages & Context Attribution (<span id="sourceCount">0</span> sources)</span>
+                        </button>
+                        <div id="sourcesList" class="hidden space-y-2 pt-1">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right 1 Col: Real-time Latency Waterfall & Analytics KPI -->
+            <div class="space-y-4">
+                <!-- Latency Waterfall Telemetry -->
+                <div class="bg-brand-card p-5 rounded-xl border border-brand-cardBorder space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="activity" class="h-4 w-4 text-emerald-400"></i>
+                            Latency Breakdown
+                        </span>
+                        <div id="totalLatencyBadge" class="text-sm font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                            0.0 ms
+                        </div>
+                    </div>
+
+                    <!-- Waterfall Bars -->
+                    <div class="space-y-2.5 text-xs" id="waterfallBars">
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-slate-400 text-[11px]">
+                                <span>1. STT Transcription</span>
+                                <span id="latStt" class="font-mono text-slate-300">0.0 ms</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                <div id="barStt" class="bg-indigo-500 h-1.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-slate-400 text-[11px]">
+                                <span>2. Input Guardrails</span>
+                                <span id="latInputGuard" class="font-mono text-slate-300">0.0 ms</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                <div id="barInputGuard" class="bg-yellow-500 h-1.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-slate-400 text-[11px]">
+                                <span>3. Vector DB & RRF</span>
+                                <span id="latRetrieval" class="font-mono text-slate-300">0.0 ms</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                <div id="barRetrieval" class="bg-cyan-500 h-1.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-slate-400 text-[11px]">
+                                <span>4. Model Harness TTFT</span>
+                                <span id="latGen" class="font-mono text-slate-300">0.0 ms</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                <div id="barGen" class="bg-emerald-500 h-1.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-slate-400 text-[11px]">
+                                <span>5. Grounding Verification</span>
+                                <span id="latGrounding" class="font-mono text-slate-300">0.0 ms</span>
+                            </div>
+                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                <div id="barGrounding" class="bg-purple-500 h-1.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>Target Budget: 200.0 ms</span>
+                        <span id="budgetRemaining" class="text-emerald-400 font-semibold">100% within SLA</span>
+                    </div>
+                </div>
+
+                <!-- Live Benchmark Runner Trigger -->
+                <div class="bg-brand-card p-5 rounded-xl border border-brand-cardBorder space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="bar-chart-3" class="h-4 w-4 text-brand-accent"></i>
+                            Latency Analytics Suite
+                        </span>
+                    </div>
+
+                    <p class="text-xs text-slate-400">
+                        Measures statistical <strong>P50 / P70 / P100</strong> metrics across 50 realistic queries on AI4Bharat MSMARCO-XI.
+                    </p>
+
+                    <button id="btnRunBenchmark" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-accent to-brand-accentHover hover:opacity-95 text-white text-xs font-bold shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition">
+                        <i data-lucide="play" class="h-4 w-4"></i>
+                        <span>Run 50-Query Benchmark Suite</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Latency Percentiles Section (P50, P70, P90, P100) -->
+        <div class="bg-brand-card p-5 rounded-xl border border-brand-cardBorder space-y-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i data-lucide="gauge" class="h-5 w-5 text-emerald-400"></i>
+                        Latency Percentiles & Distribution (P50 / P70 / P100)
+                    </h2>
+                    <p class="text-xs text-slate-400">Statistical distribution across test queries against the 200ms target</p>
+                </div>
+                <div id="sub200ComplianceBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    100.0% Sub-200ms Compliance
+                </div>
+            </div>
+
+            <!-- 5 KPI Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-center">
+                    <div class="text-[11px] text-slate-400 font-medium">P50 (Median)</div>
+                    <div id="kpiP50" class="text-xl font-bold text-emerald-400 mt-1">0.11 ms</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">SLA: &lt; 200ms</div>
+                </div>
+
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-center ring-1 ring-brand-accent/40">
+                    <div class="text-[11px] text-brand-accent font-semibold">P70 (Requirement)</div>
+                    <div id="kpiP70" class="text-xl font-bold text-brand-accent mt-1">0.13 ms</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">SLA: &lt; 200ms</div>
+                </div>
+
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-center">
+                    <div class="text-[11px] text-slate-400 font-medium">P90</div>
+                    <div id="kpiP90" class="text-xl font-bold text-cyan-400 mt-1">0.17 ms</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">SLA: &lt; 200ms</div>
+                </div>
+
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-center ring-1 ring-emerald-500/40">
+                    <div class="text-[11px] text-emerald-400 font-semibold">P100 (Max Worst-Case)</div>
+                    <div id="kpiP100" class="text-xl font-bold text-emerald-400 mt-1">0.37 ms</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">SLA: &lt; 200ms</div>
+                </div>
+
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 text-center">
+                    <div class="text-[11px] text-slate-400 font-medium">Average Latency</div>
+                    <div id="kpiAvg" class="text-xl font-bold text-slate-200 mt-1">0.12 ms</div>
+                    <div class="text-[10px] text-slate-500 mt-0.5">50 Queries</div>
+                </div>
+            </div>
+
+            <!-- Latency Chart & Stage Breakdown -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+                <div class="lg:col-span-2 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-semibold text-slate-300 mb-3 flex items-center justify-between">
+                        <span>Query Latency Distribution Across 50 Test Runs (ms)</span>
+                        <span class="text-[11px] text-emerald-400">All below 200ms threshold</span>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="benchmarkChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                    <div class="text-xs font-semibold text-slate-300 mb-3">
+                        Stage Latency Contribution (%)
+                    </div>
+                    <div class="h-64 flex items-center justify-center">
+                        <canvas id="stagePieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Settings Modal Drawer -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-brand-card border border-brand-cardBorder rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-base text-white flex items-center gap-2">
+                    <i data-lucide="sliders" class="h-5 w-5 text-brand-accent"></i>
+                    Configuration & API Keys
+                </h3>
+                <button id="btnCloseSettings" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-medium text-slate-300 mb-1">STT Provider Preference</label>
+                    <select id="settingSttProvider" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+                        <option value="sarvam">Sarvam AI (Saaras Indic/En)</option>
+                        <option value="elevenlabs">ElevenLabs (Scribe)</option>
+                        <option value="local">Fast Local Recognizer</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-300 mb-1">Sarvam AI Subscription Key</label>
+                    <input type="password" id="inputSarvamKey" placeholder="Enter Sarvam AI API Key..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white placeholder-slate-600">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-300 mb-1">ElevenLabs API Key</label>
+                    <input type="password" id="inputElevenLabsKey" placeholder="Enter ElevenLabs API Key..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white placeholder-slate-600">
+                </div>
+
+                <div>
+                    <label class="block font-medium text-slate-300 mb-1">Answer Generation Model</label>
+                    <select id="settingLlmProvider" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+                        <option value="fast_local">Ultra-Fast Local Synthesis (&lt; 5ms)</option>
+                        <option value="gemini">Google Gemini 2.0 Flash</option>
+                        <option value="groq">Groq (Llama 3.1 8B Instant)</option>
+                        <option value="openai">OpenAI (GPT-4o mini)</option>
+                    </select>
+                </div>
+
+                <div id="geminiKeyGroup">
+                    <label class="block font-medium text-slate-300 mb-1">Gemini API Key (Optional)</label>
+                    <input type="password" id="inputGeminiKey" placeholder="Enter Gemini API Key..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white placeholder-slate-600">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-3 border-t border-slate-800">
+                <button id="btnSaveSettings" class="px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs shadow transition">
+                    Save Configuration
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-brand-cardBorder py-4 text-center text-xs text-slate-500">
+        HH Goa 2026 Shortlisting Task 2 • Built with Sarvam AI, FastEmbed, SIMD Vector Store, and Multi-Tier Guardrails.
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
