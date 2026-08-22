@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  voice-rag:
+    build: .
+    container_name: hh-goa-voice-rag
+    ports:
+      - "8000:8000"
+    environment:
+      - SARVAM_API_KEY=${SARVAM_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - STT_PROVIDER=${STT_PROVIDER:-sarvam}
+      - LLM_PROVIDER=${LLM_PROVIDER:-fast_local}
+    restart: unless-stopped

@@ -1,0 +1,58 @@
+name: Voice RAG CI & Sub-200ms Benchmark
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  test-and-benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run Pytest Suite
+      run: |
+        pytest tests/ -v
+
+    - name: Execute Sub-200ms Latency Benchmark Suite
+      run: |
+        python -m rag.benchmark --strategy hierarchical --output data/benchmark_summary.json
+
+    - name: Verify P50/P70/P100 SLA Target
+      run: |
+        python -c "
+        import json
+        with open('data/benchmark_summary.json') as f:
+            data = json.load(f)
+        p50 = data['p50_latency_ms']
+        p70 = data['p70_latency_ms']
+        p100 = data['p100_max_latency_ms']
+        print(f'P50: {p50}ms | P70: {p70}ms | P100: {p100}ms')
+        assert p50 < 200.0, f'P50 {p50}ms exceeded 200ms SLA'
+        assert p70 < 200.0, f'P70 {p70}ms exceeded 200ms SLA'
+        assert p100 < 200.0, f'P100 {p100}ms exceeded 200ms SLA'
+        print('✅ All latency SLA metrics successfully passed (<200ms)!')
+        "
+
+    - name: Upload Benchmark Results Artifact
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: latency-benchmark-results
+        path: data/benchmark_summary.json
