@@ -28,7 +28,7 @@ jobs:
 
     - name: Run Pytest Suite
       run: |
-        pytest tests/ -v
+        python -m pytest tests/ -v
 
     - name: Execute Sub-200ms Latency Benchmark Suite
       run: |
